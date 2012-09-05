@@ -73,31 +73,6 @@ void HW01App::clearBackground(uint8_t* pixels, int kAppWidth, int kAppHeight){
     }
 }
 
-/**void HW01App::makeLine ( uint8_t* pixels, int x0, int y0, int x1, int y1, Color8u c ){ 
-
-	 int     x;       
-	 float   dy, dx, y, m;
-
-
-	//formula from geometry
-	 dy = y1 - y0;
-	 dx = x1 - x0;
-
-	 m = dy / dx;
-	 y = y0;
-
-	for ( x = x0; x <= x1; x++ ) {
-		int index = 3 * (x + (y * kSurfaceSize)); 
-     
-		 pixels [index]=  c.r;
-		 pixels [index+1]= c.g;
-		 pixels [index+2]= c.b; 
-      
-				  y += m;    
-			   }			
-
-}
-*/
 void HW01App::tint(uint8_t* pixels, Color8u color)
 {	for(int y = 0; y < kWinHeight; y++){
 		for(int x = 0; x < kWinWidth; x++){	
@@ -120,9 +95,12 @@ void HW01App::drawCircle (uint8_t* pixels, int center_x, int center_y, int radiu
 			if(dist <= radius)
 			{
 					int offset = 3*(x + y*kSurfaceSize);
-					pixels[offset] = fill.r;
-					pixels[offset+1] = fill.g;
-					pixels[offset+2] = fill.b;
+					//pixels[offset] = fill.r;
+					//pixels[offset+1] = fill.g;
+					//pixels[offset+2] = fill.b;
+					pixels[offset] = pixels[offset]/2 + fill.r/2;
+					pixels[offset+1] = pixels[offset+1]/2 + fill.g/2;
+					pixels[offset+2] = pixels[offset+2]/2 + fill.b/2;
 			}
 		}
 	}
