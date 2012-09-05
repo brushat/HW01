@@ -6,7 +6,7 @@
 * 
 * @note This file is (c) 2012.  It is licensed under the
 * CC gv 3.0 license (http://creativecommons.org/licenses/by/3.0/),
-* which means you are free to use, share, and remix is as long as you
+* which means you are free to use, share, and remix it as long as you
 * give attribution.  Commercial uses are allowed.
 * 
 * This project was heavily influenced by Dr. Brinkman's solution for the HW01 project:
@@ -54,10 +54,12 @@ private:
 	uint8_t* myPixels;
 	void drawCircle(uint8_t* pixels, int center_x, int center_y, int radius, Color8u fill);
 	void drawRectangle(uint8_t* pixels,int start_x, int start_y, int rect_x, int rect_y, Color8u fill);
+	void drawLineSegment(uint8_t* pixels, int x1, int y1, int length, Color8u fill);
 	void gradient(uint8_t* pixels, Color8u fill);
 	void clearBackground(uint8_t* pixels, int kAppWidth, int kAppHeight);
 	void makeLine( uint8_t* pixels, int x1, int y1, int x2, int y2, Color8u fill);
 	void tint(uint8_t* pixels, Color8u tint);
+	void drawTriangle(uint8_t* pixels, int a, int b, int c, Color8u fill);
 };
 
 void HW01App::prepSettings(Settings* settings) {
@@ -71,9 +73,9 @@ void HW01App::clearBackground(uint8_t* pixels, int kAppWidth, int kAppHeight){
     }
 }
 
-void HW01App::makeLine ( uint8_t* pixels, int x0, int y0, int x1, int y1, Color8u c ){ 
+/**void HW01App::makeLine ( uint8_t* pixels, int x0, int y0, int x1, int y1, Color8u c ){ 
 
-	 int     x, offset;       
+	 int     x;       
 	 float   dy, dx, y, m;
 
 
@@ -91,10 +93,11 @@ void HW01App::makeLine ( uint8_t* pixels, int x0, int y0, int x1, int y1, Color8
 		 pixels [index+1]= c.g;
 		 pixels [index+2]= c.b; 
       
-				  y += m;   //* Step y by slope m 
-			   }			// end for loop
+				  y += m;    
+			   }			
 
 }
+*/
 void HW01App::tint(uint8_t* pixels, Color8u color)
 {	for(int y = 0; y < kWinHeight; y++){
 		for(int x = 0; x < kWinWidth; x++){	
@@ -140,7 +143,20 @@ void HW01App::drawRectangle (uint8_t* pixels, int start_x, int start_y, int widt
 		}
 	}
 }
+void HW01App::drawLineSegment(uint8_t* pixels, int x1, int y1, int length, Color8u fill) 
+{
+	for (int i = 0; i <= length; i++) {
+		int index = 3*(x1+(y1*kSurfaceSize));
+		pixels[index] = fill.r;
+		pixels[index+1] = fill.g;
+		pixels[index+2] = fill.b;
 
+		x1 += 1;
+	}
+}
+void HW01App::drawTriangle(uint8_t* pixels, int a, int b, int c, Color8u fill){
+	//ints a, b and c coordinate to the 
+}
 void HW01App::setup()
 {
 	mySurface_ = new Surface(kSurfaceSize,kSurfaceSize,false);
@@ -187,7 +203,9 @@ void HW01App::update()
 			drawCircle(myPixels, 700, 300, 50, Color(brightnessR2_,brightnessB2_,brightnessG2_));
 			drawCircle(myPixels, 500, 500, 50, Color(brightnessR2_,brightnessB2_,brightnessG2_));
 			drawCircle(myPixels, 100, 500, 50, Color(brightnessR2_,brightnessB2_,brightnessG2_));
-			//drawLine(myPixels, 100, 1000, 1000, 500, Color8u(200,50,50));
+			drawLineSegment(myPixels, 100, 100, 400, Color8u(200,50,50));
+			drawLineSegment(myPixels, 300, 300, 400, Color8u(200,50,50));
+			drawLineSegment(myPixels, 100, 500, 400, Color8u(200,50,50));
 
 	// tint reacts interestingly because I am using the random number generator so it keeps redrawing in what looks like different colors
 	tint(myPixels, Color8u(100,1,1));
