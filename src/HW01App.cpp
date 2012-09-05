@@ -104,6 +104,15 @@ private:
 	* Satisfies the tint requirement
 	*/
 	void tint(uint8_t* pixels, Color8u tint);
+	
+	/**
+	* Copies a rectangular portion of the screen from one area to another
+	* 
+	* This method copies a rectangular region from one area of the screen to another.
+	* 
+	* Satisfies the copy requirement - NOT FUNCTIONAL YET
+	*/
+	void copyRectangle(uint8_t* pixels, int x, int y, int copyX, int copyY, int width, int height);
 };
 
 void HW01App::prepSettings(Settings* settings) {
@@ -186,6 +195,19 @@ void HW01App::tint(uint8_t* pixels, Color8u color){
 }
 
 
+void HW01App::copyRectangle(uint8_t* pixels, int x, int y, int newX, int newY, int width, int height){
+	for(int i = x; i <= width; i++){
+		for(int j = y; j <= height; j++){
+			int index1 = 3*(x+y*kSurfaceSize);
+			int index2 = 3*(newX + newY*kSurfaceSize);
+			pixels[index2] = pixels[index1];
+			pixels[index2+1] = pixels[index1+1];
+			pixels[index2+2] = pixels[index1+2];
+			newY++;
+		}
+		newX++;
+	}
+}
 void HW01App::setup()
 {
 	mySurface_ = new Surface(kSurfaceSize,kSurfaceSize,false);
@@ -232,6 +254,7 @@ void HW01App::update(){
 	drawRectangle(myPixels, 201, 0, 200,200, Color(brightnessR1_,brightnessB1_,brightnessG1_));
 	drawRectangle(myPixels, 601, 0, 199, 200, Color(brightnessR1_,brightnessB1_,brightnessG1_));
 	drawRectangle(myPixels, 201, 401, 200, 200, Color(brightnessR1_,brightnessB1_,brightnessG1_));
+	//copyRectangle(myPixels,201,0,601,0,199,200);
 	drawRectangle(myPixels, 601, 401, 199, 200, Color(brightnessR1_,brightnessB1_,brightnessG1_));
 	drawCircle(myPixels, 100, 100, 50, Color(brightnessR2_,brightnessB2_,brightnessG2_));
 	drawCircle(myPixels, 300, 300, 50, Color(brightnessR2_,brightnessB2_,brightnessG2_));
