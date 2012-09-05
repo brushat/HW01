@@ -11,6 +11,7 @@
 * 
 * This project was heavily influenced by Dr. Brinkman's solution for the HW01 project:
 * https://github.com/brinkmwj/HW01
+* Specifically his work on creating the surface, transparency, and saving the image
 * 
 * This project fulfills the following requirements for homework 1:
 * 
@@ -52,14 +53,7 @@ private:
 	boost::posix_time::ptime app_start_time_;
 	Surface* mySurface_;
 	uint8_t* myPixels;
-	/**
-	* Draw a circle
-	* 
-	* This method will draw a circle based on the center point, radius, and color of the circle
-	* 
-	* It satisfies the draw circle method
-	*/
-	void drawCircle(uint8_t* pixels, int center_x, int center_y, int radius, Color8u fill);
+	
 	/**
 	* Draw a rectangle
 	* 
@@ -70,6 +64,16 @@ private:
 	* It satisfies the rectangle requirement
 	*/
 	void drawRectangle(uint8_t* pixels,int start_x, int start_y, int rect_x, int rect_y, Color8u fill);
+	
+	/**
+	* Draw a circle
+	* 
+	* This method will draw a circle based on the center point, radius, and color of the circle
+	* 
+	* It satisfies the draw circle method
+	*/
+	void drawCircle(uint8_t* pixels, int center_x, int center_y, int radius, Color8u fill);
+	
 	/**
 	* 
 	* Draw a line segment
@@ -80,7 +84,8 @@ private:
 	* It satisfies the line segment requirement but doesn't have full functionality based on the fact that
 	* you can't make diagonal lines on the screen.
 	*/
-	void drawLineSegment(uint8_t* pixels, int x1, int y1, int length, Color8u fill);
+	void drawLineSegment(uint8_t* pixels, int x, int y, int length, Color8u fill);
+	
 	/**
 	* Clear the screen
 	* 
@@ -89,6 +94,7 @@ private:
 	* Doesn't satisfy any requirements but did help me to initially implement the update functionality
 	*/
 	void clearBackground(uint8_t* pixels, int kAppWidth, int kAppHeight);
+	
 	/**
 	* Adds a tint to the entire surface
 	* 
@@ -105,34 +111,35 @@ void HW01App::prepSettings(Settings* settings) {
 	(*settings).setResizable(true);
 }
 
-void HW01App::clearBackground(uint8_t* pixels, int kAppWidth, int kAppHeight){
-    for(int i = 0; i<kAppWidth*kAppHeight*3; i++){
-		// set everything in the pixel array to black
-        pixels[i] = 0;
-    }
-}
 
-void HW01App::tint(uint8_t* pixels, Color8u color)
-{	for(int y = 0; y < kWinHeight; y++){
-		for(int x = 0; x < kWinWidth; x++){	
+void HW01App::drawRectangle (uint8_t* pixels, int start_x, int start_y, int width, int height, Color8u fill)
+{
+
+	// start at the top left of where the rectangle should be in the array and change the pixels from there
+	for (int y = start_y; y <= (start_y + height); y++){
+		// Change all of the x for the corresponding y
+		for (int x = start_x; x <= (start_x + width); x++){
+			// row major order
 			int index = 3*(x + y*kSurfaceSize);
 
-			pixels[index]   += color.r;	
-			pixels[index+1] += color.g;	
-			pixels[index+2] += color.b;		
-		}	
+			pixels[index] = fill.r;
+			pixels[index+1] = fill.g;
+			pixels[index+2] = fill.b;
+		}
 	}
 }
 
+
 void HW01App::drawCircle (uint8_t* pixels, int center_x, int center_y, int radius, Color8u fill){
-	for(int y = center_y - radius; y <= center_y + radius; y++)
-	{
-		for(int x = center_x - radius; x <= center_x + radius; x++)
-		{
-			if(y < 0 || x < 0 || x >= kWinWidth || y >= kWinHeight) continue;
+	
+	for(int y = center_y - radius; y <= center_y + radius; y++){
+		
+		for(int x = center_x - radius; x <= center_x + radius; x++){
+			
+			// distance formula for two points
 			int dist = (int)sqrt((double)((x-center_x)*(x-center_x) + (y-center_y)*(y-center_y)));
-			if(dist <= radius)
-			{
+			
+			if(dist <= radius){
 					int index = 3*(x + y*kSurfaceSize);
 					// This is where I used some of Dr. Brinkmans code to make my circles transparent looking
 					// Satisfies the transparency requirement
@@ -144,33 +151,40 @@ void HW01App::drawCircle (uint8_t* pixels, int center_x, int center_y, int radiu
 	}
 }
 
-void HW01App::drawRectangle (uint8_t* pixels, int start_x, int start_y, int width, int height, Color8u fill)
-{
 
-	// start at the top left of where the rectangle should be in the array and change the pixels from there
-	for (int y = start_y; y <= (start_y + height); y++)
-	{
-		for (int x = start_x; x <= (start_x + width); x++)
-		{
-			// Determine locations of
-			int index = 3*(x + y*kSurfaceSize);
-			pixels[index] = fill.r;
-			pixels[index+1] = fill.g;
-			pixels[index+2] = fill.b;
-		}
-	}
-}
-void HW01App::drawLineSegment(uint8_t* pixels, int x1, int y1, int length, Color8u fill) 
-{
+void HW01App::drawLineSegment(uint8_t* pixels, int x, int y, int length, Color8u fill) {
 	for (int i = 0; i <= length; i++) {
-		int index = 3*(x1+(y1*kSurfaceSize));
+		int index = 3*(x+(y*kSurfaceSize));
+
 		pixels[index] = fill.r;
 		pixels[index+1] = fill.g;
 		pixels[index+2] = fill.b;
-
-		x1 += 1;
+		x++;
 	}
 }
+
+
+void HW01App::clearBackground(uint8_t* pixels, int kAppWidth, int kAppHeight){
+    for(int i = 0; i<kAppWidth*kAppHeight*3; i++){
+		// set everything in the pixel array to black
+        pixels[i] = 0;
+    }
+}
+
+
+void HW01App::tint(uint8_t* pixels, Color8u color){
+	for(int y = 0; y < kWinHeight; y++){
+		for(int x = 0; x < kWinWidth; x++){	
+
+			int index = 3*(x + y*kSurfaceSize);
+
+			pixels[index]   += color.r;	
+			pixels[index+1] += color.g;	
+			pixels[index+2] += color.b;		
+		}	
+	}
+}
+
 
 void HW01App::setup()
 {
@@ -178,15 +192,18 @@ void HW01App::setup()
 	frameNumber_ = 0;
 }
 
+
 void HW01App::mouseDown( MouseEvent event )
 {
+
 }
 
-void HW01App::update()
-{
+
+void HW01App::update(){
 	myPixels = (*mySurface_).getData();
 	
 	// generates a random color
+	// used random number generator help from http://www.cplusplus.com/forum/beginner/7445/
 	brightnessR1_ = (float)rand()/(float)RAND_MAX;
 	if(brightnessR1_<0.0f)
 		brightnessR1_ = 1.0f;
@@ -206,7 +223,8 @@ void HW01App::update()
 	brightnessB2_ = brightnessB2_ + 0.2f;
 	if(brightnessB2_>1.0f)
 		brightnessB2_ = 0.0f;
-			
+	
+	
 	// Draw the crazy checker board
 	// Satisfies the draw a picture/art requirement
 	drawRectangle(myPixels, 0, 201, 200, 200, Color(brightnessR1_,brightnessB1_,brightnessG1_));
@@ -232,11 +250,19 @@ void HW01App::update()
 	if(frameNumber_ == 0){
 		// Same as Dr. Brinkman's code for saving
 		// Satisfies the save an image requirement
-		writeImage("crazycheckerboard.png",*mySurface_);
+		writeImage("crazycheckerboard1f.png",*mySurface_);
 		app_start_time_ = boost::posix_time::microsec_clock::local_time();
 	}
+	if(frameNumber_ == 50){
+		// Same as Dr. Brinkman's code for saving
+		// Satisfies the save an image requirement
+		writeImage("crazycheckerboard50f.png",*mySurface_);
+		app_start_time_ = boost::posix_time::microsec_clock::local_time();
+	}
+	// Saved 2 images to show the changing colors on the screen as the frames update
 	frameNumber_++;
 }
+
 
 void HW01App::draw()
 {
