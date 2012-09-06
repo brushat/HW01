@@ -18,6 +18,8 @@
 * A1, A2, A3, and A6 as well as C, D, E2, and E5.
 */
 
+//Project peer reviewed by Brandon Dadosky, all of my comments are preceeded by two stars "**"
+
 #include "cinder/app/AppBasic.h"
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Texture.h"
@@ -25,9 +27,12 @@
 #include "Resources.h"
 #include "boost/date_time/posix_time/posix_time.hpp"
 
+#define FRAMES_PER_SECOND 60
+
 using namespace ci;
 using namespace ci::app;
 using namespace std;
+
 
 class HW01App : public AppBasic {
   public:
@@ -35,25 +40,13 @@ class HW01App : public AppBasic {
 	void mouseDown( MouseEvent event );	
 	void update();
 	void draw();
-	void prepSettings(Settings* settings);
+	void prepareSettings(Settings* settings);
 
-private:
-	static const int kWinWidth = 800;
-	static const int kWinHeight = 600;
-	static const int kSurfaceSize=1024;
-	/// Brightness of the screen. Must be between 0.0f (black) and 1.0f (white), inclusive.
-	float brightnessR1_;
-	float brightnessG1_;
-	float brightnessB1_;
-	float brightnessR2_;
-	float brightnessG2_;
-	float brightnessB2_;
+	/*
 	
-	int frameNumber_;
-	boost::posix_time::ptime app_start_time_;
-	Surface* mySurface_;
-	uint8_t* myPixels;
-	
+	**All of the following methods were grouped under private. I moved them under public so other classes would
+	be able to access them
+	*/
 	/**
 	* Draw a rectangle
 	* 
@@ -113,9 +106,29 @@ private:
 	* Satisfies the copy requirement - NOT FUNCTIONAL YET
 	*/
 	void copyRectangle(uint8_t* pixels, int x, int y, int copyX, int copyY, int width, int height);
+
+private:
+	static const int kWinWidth = 800;
+	static const int kWinHeight = 600;
+	static const int kSurfaceSize=1024;
+	/// Brightness of the screen. Must be between 0.0f (black) and 1.0f (white), inclusive.
+	float brightnessR1_;
+	float brightnessG1_;
+	float brightnessB1_;
+	float brightnessR2_;
+	float brightnessG2_;
+	float brightnessB2_;
+	
+	int frameNumber_;
+	boost::posix_time::ptime app_start_time_;
+	Surface* mySurface_;
+	uint8_t* myPixels;
+	
+	
 };
 
-void HW01App::prepSettings(Settings* settings) {
+// **This does not override the correct method and is never called, it needs to be prepareSettings(Settings* settings)
+void HW01App::prepareSettings(Settings* settings) {
 	(*settings).setWindowSize(kWinWidth,kWinHeight);
 	(*settings).setResizable(true);
 }
@@ -222,6 +235,13 @@ void HW01App::mouseDown( MouseEvent event )
 
 
 void HW01App::update(){
+	/*
+	**The program changes colors very fast, and the flashing images gave me a headache. The
+	more serious problem here is people with epilepsy could easily have a seizure by opening
+	your program. I tried something to limit the program's framerate but I couldn't get it to
+	work, I don't know much on how time is handled in Cinder, but I would definitely recommend that
+	you limit the framerate of animation somehow so people with medical issues won't have a problem with it.
+	*/
 	myPixels = (*mySurface_).getData();
 	
 	// generates a random color
